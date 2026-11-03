@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asif Study Solver</title>
+<style>
+:root{--blue:#2457db;--dark:#14264b;--bg:#f3f6fc;--white:#fff;--muted:#71809b;--border:#e5eaf4;--green:#159b70}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--dark)}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#14264b;color:white;padding:24px 15px;position:fixed;inset:0 auto 0 0;overflow-y:auto}
+.brand{font-size:20px;font-weight:bold;padding:8px 10px 27px}
+.brand span{color:#8db3ff}
+.nav-label{font-size:11px;color:#91a4c7;padding:15px 10px 8px;letter-spacing:1.5px}
+.nav{display:block;width:100%;border:0;background:transparent;color:#d7e1f4;text-align:left;padding:12px;border-radius:9px;margin:3px 0;font-size:14px}
+.nav:hover,.nav.active{background:#2b4380;color:white}
+.nav .ico{display:inline-block;width:27px}
+.main{margin-left:245px;width:calc(100% - 245px);padding:25px 32px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;gap:12px}
+.topbar h2{margin:0;font-size:22px}
+.small{color:var(--muted);font-size:13px;margin-top:6px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#dce7ff;color:var(--blue);display:grid;place-items:center;font-weight:bold}
+.welcome{background:linear-gradient(115deg,#2457db,#6688ed);padding:27px;border-radius:17px;color:white;margin-bottom:22px}
+.welcome h1{margin:0 0 9px;font-size:26px}
+.welcome p{margin:0;color:#e1eaff;font-size:14px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
+.card{background:white;border:1px solid var(--border);border-radius:14px;padding:19px;margin-bottom:16px}
+.stat{font-size:25px;font-weight:bold;margin:12px 0 5px}
+.stat-label{font-size:13px;color:var(--muted)}
+.stat-icon{font-size:23px}
+.section-title{font-size:19px;margin:25px 0 13px}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.quick button{border:1px solid var(--border);background:white;border-radius:13px;padding:18px;text-align:left;color:var(--dark)}
+.quick button:hover{border-color:var(--blue);transform:translateY(-2px)}
+.quick b{display:block;margin:9px 0 5px}
+.quick small{color:var(--muted);line-height:1.5}
+.page{display:none}.page.active{display:block}
+input,textarea,select{width:100%;padding:12px;border:1px solid #dce3ef;border-radius:9px;background:white;color:var(--dark);margin:7px 0 14px;outline-color:var(--blue)}
+textarea{min-height:105px;resize:vertical}
+label{font-size:13px;font-weight:bold}
+.btn{border:0;background:var(--blue);color:white;padding:11px 17px;border-radius:9px;font-weight:bold}
+.btn:hover{background:#1745bb}
+.btn.secondary{background:#e9efff;color:var(--blue)}
+.btn.green{background:var(--green)}
+.output{background:#f2f6ff;border-left:4px solid var(--blue);border-radius:8px;padding:16px;margin-top:15px;white-space:pre-wrap;line-height:1.7;font-size:14px}
+.progress{height:9px;background:#e9edf5;border-radius:20px;overflow:hidden;margin:10px 0}
+.progress div{height:100%;background:var(--green);border-radius:20px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.checkrow{display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border);padding:12px 0;font-size:14px}
+.checkrow input{width:auto;margin:0}
+.tag{font-size:11px;color:#187d5d;background:#e5f8ef;border-radius:20px;padding:5px 9px}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.muted{color:var(--muted);font-size:13px}
+footer{text-align:center;color:#8995a9;font-size:12px;padding:30px}
+.menu-btn{display:none;background:white;border:1px solid var(--border);padding:9px;border-radius:8px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){
+.sidebar{display:none;z-index:5;width:245px}
+.sidebar.show{display:block}
+.main{margin:0;width:100%;padding:17px}
+.menu-btn{display:block}
+.topbar h2{font-size:18px}
+.welcome h1{font-size:22px}
+.quick{grid-template-columns:1fr 1fr}
+.profile-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+ <div class="brand">🎓 Asif <span>Study Solver</span></div>
+ <div class="nav-label">MAIN MENU</div>
+ <button class="nav active" onclick="show('dashboard',this)"> <span class="ico">▦</span> Dashboard</button>
+ <button class="nav" onclick="show('doubt',this)"><span class="ico">❓</span> Doubt Solver</button>
+ <button class="nav" onclick="show('check',this)"><span class="ico">✓</span> Doubt Check</button>
+ <button class="nav" onclick="show('syllabus',this)"><span class="ico">📚</span> Syllabus Tracker</button>
+ <button class="nav" onclick="show('questions',this)"><span class="ico">✍️</span> Question & Answer</button>
+ <button class="nav" onclick="show('homework',this)"><span class="ico">📝</span> Homework Helper</button>
+ <button class="nav" onclick="show('exam',this)"><span class="ico">🎯</span> Exam Preparation</button>
+ <button class="nav" onclick="show('remaining',this)"><span class="ico">⏳</span> Remaining Syllabus</button>
+ <div class="nav-label">TEACHER ZONE</div>
+ <button class="nav" onclick="show('teacher',this)"><span class="ico">👨‍🏫</span> Teacher Portal</button>
+ <div class="nav-label">ACCOUNT</div>
+ <button class="nav" onclick="show('profile',this)"><span class="ico">👤</span> My Profile</button>
+</aside>
+
+<main class="main">
+<div class="topbar">
+ <div class="row">
+  <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('show')">☰</button>
+  <div><h2 id="pageTitle">Dashboard</h2><div class="small">Your personal learning space</div></div>
+ </div>
+ <div class="avatar" id="avatar">A</div>
+</div>
+
+<section id="dashboard" class="page active">
+ <div class="welcome">
+  <h1>Welcome to Asif Study Solver! 👋</h1>
+  <p>Learn better. Understand deeper. Achieve more.<br>Your study journey starts here.</p>
+ </div>
+ <div class="grid">
+  <div class="card"><div class="stat-icon">📖</div><div class="stat" id="totalChapters">0</div><div class="stat-label">Total chapters</div></div>
+  <div class="card"><div class="stat-icon">✅</div><div class="stat" id="doneChapters">0</div><div class="stat-label">Completed chapters</div></div>
+  <div class="card"><div class="stat-icon">⏳</div><div class="stat" id="leftChapters">0</div><div class="stat-label">Remaining chapters</div></div>
+  <div class="card"><div class="stat-icon">📊</div><div class="stat" id="percentage">0%</div><div class="stat-label">Syllabus progress</div></div>
+ </div>
+ <div class="card">
+  <div class="row"><b>Your syllabus progress</b><span class="tag" id="progressLabel">Just started</span></div>
+  <div class="progress"><div id="progressBar" style="width:0%"></div></div>
+  <div class="muted">Keep going! Every chapter counts.</div>
+ </div>
+ <h3 class="section-title">Explore your study tools</h3>
+ <div class="quick">
+  <button onclick="show('doubt')"><span>❓</span><b>Doubt Solver</b><small>Understand difficult topics.</small></button>
+  <button onclick="show('syllabus')"><span>📚</span><b>Syllabus Check</b><small>Track your chapters.</small></button>
+  <button onclick="show('questions')"><span>✍️</span><b>Prepare Q&A</b><small>Generate practice questions.</small></button>
+  <button onclick="show('homework')"><span>📝</span><b>Homework Help</b><small>Get help with assignments.</small></button>
+  <button onclick="show('exam')"><span>🎯</span><b>Exam Preparation</b><small>Prepare for your exams.</small></button>
+  <button onclick="show('teacher')"><span>👨‍🏫</span><b>Teacher Portal</b><small>Plan lessons and demonstrations.</small></button>
+ </div>
+</section>
+
+<section id="profile" class="page">
+ <div class="card">
+  <h3>👤 Student Profile</h3><p class="muted">Fill in your details to personalise your dashboard.</p>
+  <label>Full name</label><input id="name" placeholder="Enter your name">
+  <div class="profile-grid">
+   <div><label>Class</label><select id="class"><option>6</option><option>7</option><option selected>8</option></select></div>
+   <div><label>Section</label><input id="section" placeholder="e.g. C"></div>
+   <div><label>School</label><input id="school" placeholder="School name"></div>
+   <div><label>Roll number</label><input id="roll" placeholder="Your roll number"></div>
+  </div>
+  <button class="btn" onclick="saveProfile()">Save Profile</button>
+  <p class="muted" id="profileMsg"></p>
+  <hr style="border:0;border-top:1px solid #eee;margin:20px 0">
+  <b>Made by ASIF IKBAL LASKAR</b>
+ </div>
+</section>
+
+<section id="doubt" class="page">
+ <div class="card">
+  <h3>❓ Doubt Solver</h3><p class="muted">Enter your question and choose the level of explanation.</p>
+  <label>Subject</label><select id="dSubject"><option>Mathematics</option><option>Science</option><option>English</option><option>Social Science</option><option>History</option><option>Geography</option><option>Other</option></select>
+  <label>Your doubt</label><textarea id="doubtText" placeholder="Example: Why does the moon appear to change its shape?"></textarea>
+  <label>Explanation level</label><select id="dLevel"><option>Very simple</option><option selected>Class 6–8 level</option><option>Detailed</option></select>
+  <button class="btn" onclick="solve('doubt')">Explain my doubt</button>
+  <div id="doubtOut"></div>
+ </div>
+</section>
+
+<section id="check" class="page">
+ <div class="card">
+  <h3>✓ Doubt Check</h3><p class="muted">Test whether you understand a topic.</p>
+  <label>Enter your topic</label><input id="checkTopic" placeholder="e.g. Photosynthesis">
+  <label>Write what you understood</label><textarea id="checkText" placeholder="Explain the topic in your own words..."></textarea>
+  <button class="btn" onclick="solve('check')">Check my understanding</button>
+  <div id="checkOut"></div>
+ </div>
+</section>
+
+<section id="syllabus" class="page">
+ <div class="card">
+  <h3>📚 Syllabus Tracker</h3>
+  <p class="muted">Add your chapters and mark them as completed.</p>
+  <label>Subject</label><select id="sSubject"><option>Mathematics</option><option>Science</option><option>English</option><option>Social Science</option><option>History</option><option>Geography</option><option>Computer</option><option>Other</option></select>
+  <label>Chapter name</label><input id="chapterName" placeholder="Enter chapter name">
+  <button class="btn" onclick="addChapter()">+ Add chapter</button>
+  <div id="chapterList" style="margin-top:15px"></div>
+ </div>
+</section>
+
+<section id="questions" class="page">
+ <div class="card">
+  <h3>✍️ Question & Answer Maker</h3>
+  <label>Subject</label><input id="qSubject" placeholder="e.g. Science">
+  <label>Chapter / Topic</label><input id="qTopic" placeholder="Enter chapter name">
+  <label>Question type</label><select id="qType"><option>Short answer</option><option>Long answer</option><option>Multiple choice questions</option><option>Fill in the blanks</option><option>True or False</option><option>Mixed practice</option></select>
+  <label>Number of questions</label><select id="qNumber"><option>5</option><option>10</option><option>15</option><option>20</option></select>
+  <button class="btn" onclick="solve('questions')">Prepare Questions & Answers</button>
+  <div id="questionsOut"></div>
+ </div>
+</section>
+
+<section id="homework" class="page">
+ <div class="card">
+  <h3>📝 Homework & Assignment Helper</h3>
+  <label>Subject</label><input id="hSubject" placeholder="Subject">
+  <label>Assignment / Homework question</label><textarea id="hText" placeholder="Paste your question or describe your assignment..."></textarea>
+  <label>What help do you need?</label><select id="hType"><option>Explain the question</option><option>Step-by-step solution</option><option>Assignment outline</option><option>Improve my answer</option><option>Project ideas</option></select>
+  <button class="btn" onclick="solve('homework')">Get Homework Help</button>
+  <div id="homeworkOut"></div>
+ </div>
+</section>
+
+<section id="exam" class="page">
+ <div class="card">
+  <h3>🎯 Exam Preparation</h3>
+  <label>Subject</label><input id="eSubject" placeholder="Enter subject">
+  <label>Chapters to prepare</label><textarea id="eChapters" placeholder="Enter your exam chapters..."></textarea>
+  <label>Days remaining</label><input id="eDays" type="number" placeholder="e.g. 10">
+  <label>Daily study hours</label><select id="eHours"><option>1 hour</option><option>2 hours</option><option>3 hours</option><option>4 hours</option></select>
+  <button class="btn" onclick="solve('exam')">Create My Exam Plan</button>
+  <div id="examOut"></div>
+ </div>
+</section>
+
+<section id="remaining" class="page">
+ <div class="card">
+  <h3>⏳ Remaining Syllabus Planner</h3>
+  <p class="muted">See what is left and plan your next study session.</p>
+  <div id="remainingList"></div>
+  <button class="btn" onclick="show('syllabus')">Update my syllabus</button>
+ </div>
+</section>
+
+<section id="teacher" class="page">
+ <div class="welcome">
+  <h1>👨‍🏫 Teacher Portal</h1>
+  <p>Prepare better lessons. Explain with confidence. Make learning interesting.</p>
+ </div>
+ <div class="card">
+  <h3>Lesson & Demonstration Planner</h3>
+  <label>Teacher's name</label><input id="tName" placeholder="Enter teacher's name">
+  <label>Subject</label><input id="tSubject" placeholder="e.g. Science">
+  <label>Class</label><select id="tClass"><option>6</option><option>7</option><option>8</option></select>
+  <label>Chapter name</label><input id="tChapter" placeholder="Enter chapter">
+  <label>Topics to teach</label><textarea id="tTopics" placeholder="Enter the topics in this chapter..."></textarea>
+  <label>Lesson duration</label><select id="tDuration"><option>30 minutes</option><option>40 minutes</option><option>45 minutes</option><option>60 minutes</option></select>
+  <label>Teaching style</label><select id="tStyle"><option>Simple explanation</option><option>Practical demonstration</option><option>Activity-based learning</option><option>Storytelling and examples</option></select>
+  <button class="btn" onclick="solve('teacher')">Prepare Teacher's Lesson</button>
+  <div id="teacherOut"></div>
+ </div>
+ <div class="card">
+  <h3>Teacher's lesson should include</h3>
+  <p>📌 Simple chapter introduction</p>
+  <p>📖 Topic-by-topic explanation</p>
+  <p>💡 Interesting real-life examples</p>
+  <p>🧪 Practical demonstration ideas</p>
+  <p>🎤 Questions to ask students</p>
+  <p>📝 Blackboard / classroom activity ideas</p>
+  <p>✅ Short recap and assessment</p>
+ </div>
+</section>
+
+<footer>Asif Study Solver · Made by ASIF IKBAL LASKAR</footer>
+</main>
+</div>
+
+<script>
+let chapters=JSON.parse(localStorage.getItem('assChapters')||'[]');
+let profile=JSON.parse(localStorage.getItem('assProfile')||'{}');
+
+function show(id,btn){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));
+ if(btn)btn.classList.add('active');
+ else document.querySelectorAll('.nav').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+id+"'"))n.classList.add('active')});
+ const titles={dashboard:'Dashboard',profile:'My Profile',doubt:'Doubt Solver',check:'Doubt Check',syllabus:'Syllabus Tracker',questions:'Question & Answer',homework:'Homework Helper',exam:'Exam Preparation',remaining:'Remaining Syllabus',teacher:'Teacher Portal'};
+ document.getElementById('pageTitle').textContent=titles[id];
+ document.getElementById('sidebar').classList.remove('show');
+ if(id==='remaining')renderRemaining();
+}
+function saveProfile(){
+ profile={name:val('name'),class:val('class'),section:val('section'),school:val('school'),roll:val('roll')};
+ localStorage.setItem('assProfile',JSON.stringify(profile));
+ document.getElementById('profileMsg').textContent='Profile saved successfully!';
+ updateProfile();
+}
+function updateProfile(){
+ if(profile.name)document.getElementById('name').value=profile.name;
+ ['class','section','school','roll'].forEach(k=>{if(profile[k])document.getElementById(k).value=profile[k]});
+ document.getElementById('avatar').textContent=(profile.name||'A').charAt(0).toUpperCase();
+}
+function val(id){return document.getElementById(id).value.trim()}
+function addChapter(){
+ let name=val('chapterName'),subject=val('sSubject');
+ if(!name)return alert('Please enter a chapter name.');
+ chapters.push({name,subject,done:false});
+ localStorage.setItem('assChapters',JSON.stringify(chapters));
+ document.getElementById('chapterName').value='';
+ renderChapters();updateStats();
+}
+function toggleChapter(i){
+ chapters[i].done=!chapters[i].done;
+ localStorage.setItem('assChapters',JSON.stringify(chapters));
+ renderChapters();updateStats();renderRemaining();
+}
+function deleteChapter(i){
+ chapters.splice(i,1);localStorage.setItem('assChapters',JSON.stringify(chapters));
+ renderChapters();updateStats();renderRemaining();
+}
+function renderChapters(){
+ let el=document.getElementById('chapterList');
+ el.innerHTML=chapters.length?'':'<p class="muted">No chapters added yet.</p>';
+ chapters.forEach((c,i)=>{
+ let d=document.createElement('div');d.className='checkrow';
+ let check=document.createElement('input');check.type='checkbox';check.checked=c.done;check.onchange=()=>toggleChapter(i);
+ let span=document.createElement('span');span.style.flex='1';span.textContent=c.subject+' — '+c.name;
+ if(c.done)span.style.textDecoration='line-through';
+ let del=document.createElement('button');del.className='btn secondary';del.textContent='Delete';del.onclick=()=>deleteChapter(i);
+ d.append(check,span,del);el.appendChild(d);
+ });
+}
+function updateStats(){
+ let total=chapters.length,done=chapters.filter(c=>c.done).length,p=total?Math.round(done/total*100):0;
+ document.getElementById('totalChapters').textContent=total;
+ document.getElementById('doneChapters').textContent=done;
+ document.getElementById('leftChapters').textContent=total-done;
+ document.getElementById('percentage').textContent=p+'%';
+ document.getElementById('progressBar').style.width=p+'%';
+ document.getElementById('progressLabel').textContent=p===100?'All completed!':p+'% completed';
+}
+function renderRemaining(){
+ let list=document.getElementById('remainingList');list.innerHTML='';
+ let left=chapters.map((c,i)=>({...c,i})).filter(c=>!c.done);
+ if(!left.length){list.textContent=chapters.length?'Congratulations! All your chapters are complete. 🎉':'Add chapters in Syllabus Tracker to see them here.';return}
+ left.forEach(c=>{
+ let p=document.createElement('p');p.textContent='📘 '+c.subject+' — '+c.name;
+ list.appendChild(p);
+ });
+}
+function output(id,text){
+ let el=document.getElementById(id);el.innerHTML='';
+ let box=document.createElement('div');box.className='output';box.textContent=text;
+ let copy=document.createElement('button');copy.className='btn secondary';copy.textContent='Copy response';copy.style.marginTop='12px';
+ copy.onclick=()=>navigator.clipboard?.writeText(text).then(()=>alert('Copied!')).catch(()=>alert('Please select and copy the text.'));
+ el.append(box,copy);
+}
+function solve(type){
+ const prompts={
+ doubt:'Explain this doubt simply, step by step. Include an example and a short summary.\nSubject: '+val('dSubject')+'\nLevel: '+val('dLevel')+'\nDoubt: '+val('doubtText'),
+ check:'Assess this student explanation. Identify correct ideas, mistakes, missing points, and suggest a corrected explanation. Be encouraging.\nTopic: '+val('checkTopic')+'\nStudent explanation: '+val('checkText'),
+ questions:'Create '+val('qNumber')+' '+val('qType')+' questions WITH answers suitable for Class 6–8. Make answers clear and accurate.\nSubject: '+val('qSubject')+'\nTopic: '+val('qTopic'),
+ homework:'Help a student understand and complete this assignment. Explain steps and encourage their own work.\nSubject: '+val('hSubject')+'\nHelp type: '+val('hType')+'\nQuestion: '+val('hText'),
+ exam:'Create a realistic daily exam preparation plan, revision timetable and practice strategy.\nSubject: '+val('eSubject')+'\nChapters: '+val('eChapters')+'\nDays: '+val('eDays')+'\nStudy time: '+val('eHours'),
+ teacher:'Create a complete teacher lesson plan with simple explanations for every topic, learning objectives, real-life practical examples, classroom demonstration using safe and easily available materials, student activities, questions, blackboard plan, and recap. Give the teacher speaking guidance.\nTeacher: '+val('tName')+'\nSubject: '+val('tSubject')+'\nClass: '+val('tClass')+'\nChapter: '+val('tChapter')+'\nTopics: '+val('tTopics')+'\nDuration: '+val('tDuration')+'\nTeaching style: '+val('tStyle')
+ };
+ if(type==='doubt'&&!val('doubtText')||type==='check'&&(!val('checkTopic')||!val('checkText'))||type==='questions'&&(!val('qSubject')||!val('qTopic'))||type==='homework'&&(!val('hSubject')||!val('hText'))||type==='exam'&&(!val('eSubject')||!val('eChapters'))||type==='teacher'&&(!val('tSubject')||!val('tChapter')||!val('tTopics'))){alert('Please fill in the required fields first.');return}
+ let messages={
+ doubt:'doubtOut',check:'checkOut',questions:'questionsOut',homework:'homeworkOut',exam:'examOut',teacher:'teacherOut'
+ };
+ output(messages[type], 'Your request is ready!\n\nTo get an actual AI-generated response, connect this website to an AI service through a secure backend.\n\nRequest details:\n'+prompts[type]+'\n\nThis demo currently prepares your prompt but does not connect to an AI model.');
+}
+updateProfile();renderChapters();updateStats();
+</script>
+</body>
+</html>
